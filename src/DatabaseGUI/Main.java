@@ -50,6 +50,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
   private static DBTableModel myTable;
   private static Button queryButton;
   private static TextArea queryBox;
+  private static Label queryColumnName;
   private static Label queryAnswer;
 
   @Override
@@ -69,20 +70,20 @@ public class Main extends Application implements EventHandler<ActionEvent> {
       myGrid.setVgap(10); // vertical gap of 10 pixels between components
       myGrid.setHgap(10); // height gap of 10 pixels between components
 
-      Label testLabel = new Label("Last name: ");
+      queryColumnName = new Label("Default text:");
       queryBox = new TextArea(DEFAULT_QUERY); // populate the text field with the default query
       queryButton = new Button("Select Query"); // Button's text reads as "Select Query"
-      queryAnswer = new Label("I'm the default text"); // Couldn't tell where the label was.
+      queryAnswer = new Label("I'm also default text!"); // Couldn't tell where the label was.
 
       queryBox.setPrefWidth(400);
       queryBox.setPrefHeight(100);
       //queryBox
-      //queryBox.setAlignment(Pos.TOP_LEFT);
+      //queryBox.setAlignment(Pos.TOP_LEFT); // was used for TextField, not for TextArea.
 
       // add the three components to the GridPane object.
       myGrid.add(queryBox, 0, 0, 1, 1);
       myGrid.add(queryButton, 1, 0, 1, 1);
-      myGrid.add(testLabel, 0, 1, 1, 1);
+      myGrid.add(queryColumnName, 0, 1, 1, 1);
       myGrid.add(queryAnswer, 1, 1, 1, 1);
 
       queryButton.setOnAction(this); // leads to the handle method. Defines what button does.
@@ -115,6 +116,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
     if (event.getSource() == queryButton) { // User hit the query button.
       try {
         myTable.setQuery(queryBox.getText()); // sets up the query for the myTable object.
+        queryColumnName.setText(myTable.getQueryColumnName()); // name of query column
         queryAnswer.setText(myTable.getQueryAnswer()); // writes query answer to the label
       } catch (SQLException sqlEx) { // myTable may result in an SQLException
         System.out.println("Issue with SQL statement");

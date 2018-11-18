@@ -80,6 +80,18 @@ public class DBTableModel {
   }// end of setQuery method
 
   /**
+   * This method will set the value of the column name as the text in the left label. It makes it
+   * easier to tell what is currently being displayed.
+   */
+  public String getQueryColumnName() {
+    try {
+      return metaData.getColumnName(1);
+    } catch (SQLException sqlEx) {
+      return "Issue with database";
+    }
+  }
+
+  /**
    * As the initial project submission, this method is only returning a single column of output from
    * the ResultSet object. For this reason, I've only typed "1" as the argument for the column
    * index. In the next submission, this not have such a trivial argument.
