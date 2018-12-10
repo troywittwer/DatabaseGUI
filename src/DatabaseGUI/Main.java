@@ -8,7 +8,6 @@
 
 package DatabaseGUI;
 
-import com.sun.corba.se.impl.io.TypeMismatchException;
 import java.sql.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
