@@ -8,35 +8,23 @@
 
 package DatabaseGUI;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
+import com.sun.corba.se.impl.io.TypeMismatchException;
+import java.sql.*;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
-import javafx.event.ActionEvent;
+import javafx.collections.*;
+import javafx.event.*;
 import java.sql.SQLException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
+import javafx.scene.*;
+import javafx.scene.control.*;
 import javafx.scene.control.TableColumn.CellDataFeatures;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import javafx.scene.shape.*;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -67,14 +55,26 @@ public class Main extends Application implements EventHandler<ActionEvent> {
    */
 
   private static DBTableModel myTable;
+  private static CustomAnimation myAnimation;
   private static GridPane outerGrid;
   private static GridPane innerLeftGrid;
   private static GridPane innerRightGrid;
+
   private static HBox guiButtons;
+  private static HBox shapeStuff;
+  private static HBox sliderStuff;
+
   private static Button queryButton;
   private static Button resetButton;
+  private static Button colorButton;
+  private static Label sliderLabel;
+  private static TextField sliderValue;
   private static TextArea queryBox;
-  private static ColorPicker textColor = new ColorPicker(Color.BLACK);
+  private static Slider timeSlider;
+
+  private static ColorPicker shapeColor = new ColorPicker(Color.BLACK);
+  private static Circle myCircle;
+  private static Line myLine;
 
   private static ObservableList<ObservableList> data;
   private static TableView table = new TableView();
@@ -89,39 +89,99 @@ public class Main extends Application implements EventHandler<ActionEvent> {
      * Try block attempts to create the database connection and sets up the GUI, afterwards.
      */
     try {
-      // Form a database connection.
-      //myTable = new DBTableModel(DATABASE_URL, USERNAME, PASSWORD, DEFAULT_QUERY);
-
       // Create a GridPane for a very basic GUI. It's got a text field, button, and a label.
       outerGrid = new GridPane();
       innerLeftGrid = new GridPane();
-      innerRightGrid = new GridPane();
       innerLeftGrid.setVgap(10); // vertical gap of 10 pixels between components
       innerLeftGrid.setHgap(10); // height gap of 10 pixels between components
 
+      innerRightGrid = new GridPane();
+      innerRightGrid.setVgap(10);
+      innerRightGrid.setHgap(10);
+
       guiButtons = new HBox();
+      shapeStuff = new HBox();
+      sliderStuff = new HBox();
 
       queryBox = new TextArea(DEFAULT_QUERY); // populate the text field with the default query
       queryButton = new Button("Select Query"); // Button's text reads as "Select Query"
-      resetButton = new Button("Reset");
+      resetButton = new Button("Reset Table");
 
-      guiButtons.getChildren().addAll(queryButton, resetButton, textColor);
+      colorButton = new Button("Change Color");
+      colorButton.setOnAction(e -> myCircle.setFill(shapeColor.getValue()));
+
+      myCircle = new Circle();
+      myCircle.setCenterX(100.0f);
+      myCircle.setCenterY(100.0f);
+      myCircle.setRadius(50.0f);
+      myCircle.setFill(shapeColor.getValue());
+
+      myLine = new Line(0, 0, 0, 50);
+      myLine.setTranslateX(100);
+      myLine.setTranslateY(100);
+      myLine.setStroke(Color.WHITE);
+
+      Group clockyThing = new Group(myCircle, myLine);
+
+      timeSlider = new Slider(0, 200, 200);
+      sliderLabel = new Label("Width:");
+      sliderValue = new TextField(Double.toString(timeSlider.getValue()));
+
+      /**
+       * The slider will automatically update the value of the text field when used.
+       */
+      timeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+        public void changed(ObservableValue<? extends Number> obvValues,
+            Number oldValue, Number newValue) {
+          double truncatedValue = (int) timeSlider.getValue();
+          sliderValue.setText(Double.toString(truncatedValue));
+        }
+      });
+
+      /**
+       * The text field can also update the slider's position when a value is typed and the enter
+       * key is pressed.
+       */
+      sliderValue.setOnAction(e -> {
+        try {
+          double userNumber = Double.parseDouble(sliderValue.getText());
+          timeSlider.setValue(userNumber);
+        } catch (NullPointerException nullEx) {
+          System.out.println("Null value submitted for slider value.");
+          timeSlider = new Slider(0, 100, 100);
+          sliderValue = new TextField(Double.toString(timeSlider.getValue()));
+        } catch (Exception wrongTypeEx) {
+          System.out.println("Incorrect slider input. Please enter a number.");
+        }
+      });
+
+      sliderStuff.getChildren().addAll(sliderLabel, sliderValue, timeSlider);
+
+      guiButtons.getChildren().addAll(queryButton, resetButton);
       guiButtons.setSpacing(10);
+      guiButtons.setMinWidth(350);
 
-      queryBox.setPrefWidth(400);
+      shapeStuff.getChildren().addAll(colorButton, shapeColor);
+      shapeStuff.setSpacing(10);
+      shapeStuff.setMinWidth(350);
+
+      queryBox.setPrefWidth(700);
       queryBox.setPrefHeight(100);
-      table.setMaxWidth(400);
-
+      table.setMaxWidth(700);
 
       //queryBox.setAlignment(Pos.TOP_LEFT); // was used for TextField, not for TextArea.
 
       // add the components to the GridPane object.
       innerLeftGrid.add(queryBox, 0, 0, 1, 1);
       innerLeftGrid.add(table, 0, 2, 1, 2);
-      innerLeftGrid.setPadding(new Insets(25,25,25,25));
+      innerLeftGrid.setPadding(new Insets(25, 25, 25, 25));
 
       innerRightGrid.add(guiButtons, 0, 0, 1, 1);
-      innerRightGrid.setPadding(new Insets(25,25,25,25));
+      innerRightGrid.add(shapeStuff, 0, 1, 1, 1);
+      innerRightGrid.add(clockyThing, 0, 2, 1, 1);
+      innerRightGrid.add(sliderStuff, 0, 3, 1, 1);
+      innerRightGrid.setPadding(new Insets(25, 25, 25, 25));
+      innerRightGrid.setPrefWidth(350);
 
       outerGrid.add(innerLeftGrid, 0, 0, 1, 2);
       outerGrid.add(innerRightGrid, 1, 0, 1, 2);
@@ -129,8 +189,10 @@ public class Main extends Application implements EventHandler<ActionEvent> {
       queryButton.setOnAction(this); // leads to the handle method. Defines what button does.
       resetButton.setOnAction(this);
 
-      primaryStage.setTitle("Initial GUI Project");
-      primaryStage.setScene(new Scene(outerGrid, 800, 350)); // add GridPane to scene
+      primaryStage.setTitle("Final GUI Project");
+      Scene myScene = new Scene(outerGrid, 1100, 350);
+      myScene.getStylesheets().add("myCss.css"); // CSS cannot be used in community version
+      primaryStage.setScene(myScene); // add GridPane to scene
       primaryStage.show();
 
       // Need to find the JavaFX equivalent to TableRowSorter & TableModel.
@@ -178,13 +240,11 @@ public class Main extends Application implements EventHandler<ActionEvent> {
               new Callback<CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
                 public ObservableValue<String> call(
                     CellDataFeatures<ObservableList, String> param) {
-                  //System.out.println("currColumn: " + currColumn);
                   return new SimpleStringProperty(param.getValue().get(currColumn).toString());
                 }
               });
 
           table.getColumns().addAll(col);
-          System.out.println("Column[" + column + "] ");
         }
 
         while (rs.next()) {
@@ -192,10 +252,8 @@ public class Main extends Application implements EventHandler<ActionEvent> {
           for (int column = 1; column <= rsmd.getColumnCount(); column++) {
             row.add(rs.getString(column));
           }
-          System.out.println("Row [1] added " + row);
           data.add(row);
         }
-        table.getItems().clear();
         table.setItems(data);
         rs.close();
         DatabaseConnect.disconnect();
@@ -210,15 +268,18 @@ public class Main extends Application implements EventHandler<ActionEvent> {
         }//end of catch
       }// end of catch
     }//end of if
+
     else if (event.getSource() == resetButton) {
       queryBox.setText(DEFAULT_QUERY);
+      shapeColor.getCustomColors().remove(shapeColor);
       table.getItems().clear();
       table.getColumns().clear();
     }// end of else-if
-    else if (event.getSource() == textColor){
-      Color userColor = textColor.getValue();
-      innerLeftGrid.setBackground(new Background(new BackgroundFill(userColor, CornerRadii.EMPTY, Insets.EMPTY)));
+
+    else if (event.getSource() == colorButton) {
+      myCircle.setFill(shapeColor.getValue());
     }
+
   }// end of handle method
 
   /**
