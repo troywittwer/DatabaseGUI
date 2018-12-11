@@ -54,3 +54,28 @@ The slider and textfield are both functioning off of eachother's value. When the
 The slider was originally intended to be used as a distance that the Circle object would move, but, again, I couldn't grasp how to perform an animation. 
 
 I did submit a CSS stylesheet and made sure the stylesheet was applied to the Scene object before setting the scene, however the community version of IntelliJ doesn't allow the use of CSS. I've based the styles listed in the CSS file off of standard naming conventions, so I would assume it works (I haven't been able to test it, though).
+
+-------------------------------------------------------------------------------------------------
+Adding some queries:
+
+--SQL WHERE statement
+SELECT *
+FROM customers
+WHERE firstName = 'Ellie'
+
+--SQL Order By
+SELECT *
+FROM customers
+Order By firstName
+
+--SQL AND
+SELECT *
+FROM customers
+WHERE lastName = 'Lock' AND age = 10
+
+--SQL Multiple Joins (and I guess singular join, too)
+SELECT cust.firstName, cust.lastName, prod.name, prod.pricePerUnit
+FROM ((customers cust INNER JOIN orders ord ON cust.customerID = ord.customerID)
+  INNER JOIN order_product op ON ord.orderNumber = op.orderNumber)
+  INNER JOIN products prod ON op.productID = prod.productID
+
