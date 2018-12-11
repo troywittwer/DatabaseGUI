@@ -9,6 +9,7 @@
 package DatabaseGUI;
 
 // I probably shouldn't have used all of these wildcards. Program is a little slow on start up.
+
 import java.sql.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -227,7 +228,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
         c = DatabaseConnect.connect(); // attempt to connect to the database
         s = c.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         //the result set will consist of the statement provided by the user in the text-area
-        try{
+        try {
           rs = s.executeQuery(queryBox.getText());
           ResultSetMetaData rsmd = rs.getMetaData(); // rsmd consists of rs' metadata
 
@@ -285,7 +286,8 @@ public class Main extends Application implements EventHandler<ActionEvent> {
             for (int column = 1; column <= rsmd.getColumnCount(); column++) {
               row.add(rs.getString(column));
             }
-            data.add(row); // add the ObservableList<String> row to the ObservableList<ObservableList>
+            data.add(
+                row); // add the ObservableList<String> row to the ObservableList<ObservableList>
           }
 
           /**
@@ -293,7 +295,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
            * collection are added to the class-level TableView object.
            */
           table.setItems(data);
-        }catch (SQLException sqlEx2){
+        } catch (SQLException sqlEx2) {
           System.out.println("Issue with SQL statement");
           queryBox.setText(DEFAULT_QUERY); // set TextArea back to default query.
 
