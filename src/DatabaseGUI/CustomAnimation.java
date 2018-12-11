@@ -9,8 +9,8 @@ import javafx.util.Duration;
 
 public class CustomAnimation {
 
-  private static double width;
-  private static Timeline timeline;
+  private double width;
+  private Timeline timeline;
 
   private static DoubleProperty x = new SimpleDoubleProperty();
   private static DoubleProperty y = new SimpleDoubleProperty();
@@ -24,6 +24,11 @@ public class CustomAnimation {
     timeline.setCycleCount(Timeline.INDEFINITE);
   }
 
+  /**
+   * This constructor was meant to allow a user to affect the distance traveled by the circle shape
+   * by assigning a value through the slider. I ran out of time to implement this.
+   * @param width
+   */
   CustomAnimation(double width){
     this.width = width;
     timeline = new Timeline(

@@ -41,16 +41,7 @@ public class DBTableModel {
   private boolean databaseConnected = false;
 
   /**
-   * Constructor for the DBTableModel class. This constructor will check to see if a connection can
-   * be made, create the connection to the database, assign a true value to the boolean representing
-   * whether or not the database has been connected to, and will pass the user's query to the
-   * setQuery method.
-   *
-   * @param url a String literal holding the URL location of the database
-   * @param userName a String literal holding the username that I created when setting up database
-   * @param pw a String literal holding the password taht I created when setting up database
-   * @param sqlQuery a String literal containing the default query.
-   * @throws SQLException database connection may result in an SQL error if the connection fails
+   * I wound up not using this class in the final submission.
    */
   public DBTableModel(String url, String userName, String pw, String sqlQuery) throws SQLException {
     // use the first three parameters in an object used to try and connect to the database
