@@ -197,7 +197,7 @@ public class Main extends Application implements EventHandler<ActionEvent> {
     outerGrid.add(innerRightGrid, 1, 0, 1, 2);
 
     queryButton.setOnAction(this); // leads to the handle method. Defines what button does.
-    //resetButton.setOnAction(this);
+    resetButton.setOnAction(this);
 
     primaryStage.setTitle("Final GUI Project");
     Scene myScene = new Scene(outerGrid, 1100, 350);
