@@ -32,6 +32,8 @@ the output would display the last row's result (employeeID = 4).
 -------------------------------------------------------------
 Date: 12/10/2018
 
+![](FinalProjectRunthrough.gif)
+
 The project has taken one large change: rather than using the DBTableModel class, I've performed database connectivity in the DatabaseConnect class. ResultSet, it's metadata, and the TableView have all been moved to the Main class.
 
 Aside from the performing some lambda expressions, the start method primarily consists of instatiating GUI components and adding them to the scene.
